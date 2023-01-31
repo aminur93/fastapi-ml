@@ -1,0 +1,7 @@
+# requirements.txt
+fastapi
+uvicorn
+sklearn
+sqlalchemy
+pymysql
+cryptography

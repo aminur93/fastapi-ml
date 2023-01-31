@@ -1,0 +1,52 @@
+version: '3.7'
+
+networks:
+    web-app-net:
+        name: my-web-app-net
+        driver: bridge
+
+volumes:
+    barc-ml-data:
+
+services:
+     # barc-ml-app service
+    barc-ml-app:
+        #image: devndl/ndl-apps:ml-service-1.0
+        image: ml-service:1.0
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - 8000:8000
+        depends_on:
+            - barc-ml-db
+        networks:
+            - web-app-net
+
+    # barc-ml-mysql services
+    barc-ml-db:
+        image: mysql:8.0
+        ports:
+            - 3306:3306
+        environment:
+            - MYSQL_DATABASE=py_crud
+            - MYSQL_ROOT_USER=root
+            - MYSQL_PASSWORD=password
+            - MYSQL_ROOT_PASSWORD=password
+        volumes:
+            - barc-ml-data:/var/lib/mysql
+        networks:
+            - web-app-net
+
+    # PhpMyAdmin service
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        environment:
+            PMA_HOST: barc-ml-db
+            PMA_PORT: 3306
+        ports:
+            - 8081:80
+        depends_on:
+            - barc-ml-db
+        networks:
+            - web-app-net
